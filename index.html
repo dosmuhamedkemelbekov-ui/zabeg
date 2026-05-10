@@ -295,6 +295,158 @@
             </div>
         </div>
     </section>
+    <!-- Добавьте этот блок СРАЗУ ПОСЛЕ раздела "О забеге" (после тега </section>) -->
+
+<section class="story">
+    <div class="container">
+        <div class="story-grid">
+            <!-- Фотографии -->
+            <div class="story-images" data-aos="fade-right">
+                <div class="image-wrapper main-photo">
+                    <img src="ССЫЛКА_НА_ФОТО_ДАСТАНА_В_ГОРАХ" alt="Мейрбай Дастан">
+                    <span class="photo-label">Дастан</span>
+                </div>
+                <div class="image-wrapper hospital-photo">
+                    <img src="ССЫЛКА_НА_ФОТО_ИЗ_БОЛЬНИЦЫ" alt="Текущее состояние">
+                </div>
+            </div>
+
+            <!-- Текст и диагноз -->
+            <div class="story-text" data-aos="fade-left">
+                <h2 class="section-title">История Дастана</h2>
+                <p>Мейрбай Дастан — брат нашей студентки, чья жизнь изменилась в один момент. Сейчас он борется с тяжелыми последствиями заболевания, и ему нужна наша поддержка для прохождения реабилитации.</p>
+                
+                <div class="diagnosis-card">
+                    <h3>Медицинский диагноз:</h3>
+                    <ul>
+                        <li>Энцефалопатия токсического генеза</li>
+                        <li>Хроническая двухсторонняя пневмония</li>
+                        <li>Нижний парапарез</li>
+                        <li>Поражение мозга</li>
+                    </ul>
+                </div>
+                <p class="transparency-note">Все медицинские документы подтверждены и могут быть предоставлены по запросу оргкомитету.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Стили для нового блока с фото */
+    .story-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+    }
+
+    .story-images {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .image-wrapper {
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .main-photo {
+        width: 100%;
+        height: 450px;
+    }
+
+    .main-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hospital-photo {
+        width: 60%;
+        height: 250px;
+        position: absolute;
+        bottom: -40px;
+        right: -20px;
+        border: 8px solid var(--white);
+    }
+
+    .hospital-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-label {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255,255,255,0.9);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .diagnosis-card {
+        background: #fff4f4; /* Нежно-красный фон для серьезности темы */
+        padding: 30px;
+        border-radius: 20px;
+        margin: 30px 0;
+        border-left: 4px solid #ff4b4b;
+    }
+
+    .diagnosis-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        color: #d32f2f;
+    }
+
+    .diagnosis-card ul {
+        list-style: none;
+    }
+
+    .diagnosis-card ul li {
+        margin-bottom: 8px;
+        font-weight: 500;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .diagnosis-card ul li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #d32f2f;
+    }
+
+    .transparency-note {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Адаптивность для мобилок */
+    @media (max-width: 768px) {
+        .story-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        .hospital-photo {
+            position: relative;
+            width: 100%;
+            bottom: 0;
+            right: 0;
+            height: 200px;
+        }
+        .main-photo {
+            height: 350px;
+        }
+    }
+</style>
 
     <!-- 3. DETAILS -->
     <section>
