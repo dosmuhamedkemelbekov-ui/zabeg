@@ -1,40 +1,432 @@
-var sheetName = 'Sheet1'
-var scriptProp = PropertiesService.getScriptProperties()
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAGI Running — Благотворительный забег</title>
+    
+    <!-- Шрифты и Иконки -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- AOS Анимации -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-function intialSetup () {
-  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  scriptProp.setProperty('key', activeSpreadsheet.getId())
-}
+    <style>
+        :root {
+            --white: #ffffff;
+            --black: #0a0a0a;
+            --dark-blue: #1a237e;
+            --accent-blue: #2962ff;
+            --gray: #f5f5f7;
+            --text-muted: #666;
+        }
 
-function doPost (e) {
-  var lock = LockService.getScriptLock()
-  lock.tryLock(10000)
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-  try {
-    var doc = SpreadsheetApp.openById(scriptProp.getProperty('key'))
-    var sheet = doc.getSheetByName(sheetName)
+        body {
+            background-color: var(--white);
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
-    var nextRow = sheet.getLastRow() + 1
+        /* Общие стили */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
 
-    var newRow = headers.map(function(header) {
-      return header === 'timestamp' ? new Date() : e.parameter[header]
-    })
+        section {
+            padding: 100px 0;
+        }
 
-    sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow])
+        h1, h2 {
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
 
-    return ContentService
-          .createTextOutput(JSON.stringify({ 'result': 'success', 'row': nextRow }))
-          .setMimeType(ContentService.MimeType.JSON)
-  }
+        .btn {
+            display: inline-block;
+            padding: 18px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
 
-  catch (e) {
-    return ContentService
-          .createTextOutput(JSON.stringify({ 'result': 'error', 'error': e }))
-          .setMimeType(ContentService.MimeType.JSON)
-  }
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+        }
 
-  finally {
-    lock.releaseLock()
-  }
-}
+        .btn-primary:hover {
+            background: var(--dark-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--black);
+            color: var(--black);
+        }
+
+        .btn-outline:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* 1. HERO SECTION */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), 
+                        url('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&q=80') center/cover;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* 2. ABOUT */
+        .about {
+            background: var(--gray);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 40px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .about-text span {
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        /* 3. DETAILS */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .detail-card {
+            padding: 40px;
+            border: 1px solid #eee;
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .detail-card:hover {
+            border-color: var(--dark-blue);
+            background: var(--gray);
+        }
+
+        .detail-card i {
+            margin-bottom: 20px;
+            color: var(--dark-blue);
+        }
+
+        .detail-card h3 {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .detail-card p {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        /* 5. DONATION BLOCK */
+        .donate-box {
+            background: var(--dark-blue);
+            color: var(--white);
+            padding: 60px;
+            border-radius: 40px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .kaspi-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .copy-btn {
+            background: var(--white);
+            color: var(--dark-blue);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 6. REGISTRATION FORM */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--dark-blue);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 80px 0;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .about-grid { grid-template-columns: 1fr; }
+            section { padding: 60px 0; }
+            .hero h1 { font-size: 3.5rem; }
+            .donate-box { padding: 30px; }
+            .kaspi-number { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content" data-aos="fade-up">
+                <h1>EAGI <br>RUNNING</h1>
+                <p>Благотворительный забег. Бежим вместе, чтобы помочь Дастану. Каждый километр — это поддержка.</p>
+                <div class="hero-btns">
+                    <a href="#register" class="btn btn-primary">Зарегистрироваться — 2000 ₸</a>
+                    <a href="#donate" class="btn btn-outline">Помочь финансово</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. ABOUT -->
+    <section class="about">
+        <div class="container">
+            <div class="about-grid">
+                <h2 class="section-title" data-aos="fade-right">Зачем <br>мы бежим</h2>
+                <div class="about-text" data-aos="fade-left">
+                    Этот забег организован студентами <span>ЕАГИ</span>. Мы объединяемся ради одной цели — поддержать брата нашей студентки. Каждое участие — это вклад в реальную помощь. Это не просто спорт, это <span>сообщество и смысл</span>.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. DETAILS -->
+    <section>
+        <div class="container">
+            <div class="details-grid">
+                <div class="detail-card" data-aos="zoom-in" data-aos-delay="100">
+                    <i data-lucide="calendar"></i>
+                    <h3>Дата</h3>
+                    <p>19 Мая, 09:00</p>
+                </div>
+                <div class="detail-card" data-aos="zoom-in" data-aos-delay="200">
+                    <i data-lucide="map-pin"></i>
+                    <h3>Место</h3>
+                    <p>Триатлон парк</p>
+                </div>
+                <div class="detail-card" data-aos="zoom-in" data-aos-delay="300">
+                    <i data-lucide="route"></i>
+                    <h3>Дистанция</h3>
+                    <p>4 Километра</p>
+                </div>
+                <div class="detail-card" data-aos="zoom-in" data-aos-delay="400">
+                    <i data-lucide="users"></i>
+                    <h3>Кто может</h3>
+                    <p>Все желающие</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. DONATION -->
+    <section id="donate">
+        <div class="container">
+            <div class="donate-box" data-aos="fade-up">
+                <h2>Сбор средств</h2>
+                <p>Все средства направляются напрямую на лечение Мейрбай Дастана</p>
+                <span class="kaspi-number" id="kaspiNumber">+7 700 271 0774</span>
+                <p style="margin-bottom: 20px;">Айгерім А.</p>
+                <button class="copy-btn" onclick="copyNumber()">
+                    <i data-lucide="copy"></i> Скопировать номер
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. REGISTRATION -->
+    <section id="register">
+        <div class="container">
+            <div class="form-container">
+                <h2 class="section-title" style="text-align: center; margin-bottom: 50px;">Регистрация</h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input type="text" name="first_name" required placeholder="Иван">
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия</label>
+                        <input type="text" name="last_name" required placeholder="Иванов">
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон</label>
+                        <input type="tel" name="phone" required placeholder="+7 (___) ___ __ __">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram ник</label>
+                        <input type="text" name="instagram" placeholder="@username">
+                    </div>
+                    <div class="form-group">
+                        <label>Формат участия</label>
+                        <select name="participation_type">
+                            <option value="Бегу">Я бегу (взнос 2000 ₸)</option>
+                            <option value="Поддерживаю">Просто поддерживаю</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Комментарий</label>
+                        <textarea name="comment" rows="3" placeholder="Слова поддержки..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+                </form>
+                <div id="successMessage" style="display:none; text-align:center; margin-top:20px; color: green; font-weight:700;">
+                    Спасибо! Данные успешно отправлены.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FINAL -->
+    <footer>
+        <div class="container">
+            <h2 style="font-size: 3rem; margin-bottom: 20px;">Вместе мы можем больше</h2>
+            <p style="margin-bottom: 40px; opacity: 0.7;">Один забег • Одна цель • Одна поддержка</p>
+            <div class="footer-logo">EAGI RUNNING</div>
+            <p>© 2024 Студенческое сообщество ЕАГИ</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Инициализация иконок и анимаций
+        lucide.createIcons();
+        AOS.init({ duration: 1000, once: true });
+
+        // Функция копирования номера
+        function copyNumber() {
+            const num = document.getElementById('kaspiNumber').innerText;
+            navigator.clipboard.writeText(num);
+            alert('Номер скопирован: ' + num);
+        }
+
+        // Интеграция с Google Таблицей
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxN0cEf1Sp_CEp_j5m_HiVfBn-hCsaFHpm1XqagvMEU4LuqdNcIdwBAdHLasvkZlZFAcQ/exec';
+        const form = document.getElementById('registrationForm');
+        const successMsg = document.getElementById('successMessage');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const btn = form.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = 'Отправка...';
+
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    form.style.display = 'none';
+                    successMsg.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    alert('Произошла ошибка. Попробуйте еще раз.');
+                    btn.disabled = false;
+                    btn.innerText = 'Зарегистрироваться';
+                });
+        });
+    </script>
+</body>
+</html>
